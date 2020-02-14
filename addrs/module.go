@@ -33,11 +33,7 @@ func (m Module) String() string {
 	if len(m) == 0 {
 		return ""
 	}
-	var steps []string
-	for _, s := range m {
-		steps = append(steps, "module", s)
-	}
-	return strings.Join(steps, ".")
+	return strings.Join([]string(m), ".")
 }
 
 // Child returns the address of a child call in the receiver, identified by the
