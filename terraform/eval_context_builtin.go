@@ -105,7 +105,7 @@ func (ctx *BuiltinEvalContext) Input() UIInput {
 	return ctx.InputValue
 }
 
-func (ctx *BuiltinEvalContext) InitProvider(typeName string, addr addrs.AbsProviderConfig) (providers.Interface, error) {
+func (ctx *BuiltinEvalContext) InitProvider(addr addrs.AbsProviderConfig) (providers.Interface, error) {
 	ctx.once.Do(ctx.init)
 	absAddr := addr
 	if !absAddr.Module.Equal(ctx.Path()) {
@@ -126,12 +126,12 @@ func (ctx *BuiltinEvalContext) InitProvider(typeName string, addr addrs.AbsProvi
 
 	key := absAddr.String()
 
-	p, err := ctx.Components.ResourceProvider(typeName)
+	p, err := ctx.Components.ResourceProvider(addr.Provider)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("[TRACE] BuiltinEvalContext: Initialized %q provider for %s", typeName, absAddr)
+	log.Printf("[TRACE] BuiltinEvalContext: Initialized %q provider for %s", addr.LegacyString(), absAddr)
 	ctx.ProviderCache[key] = p
 
 	return p, nil
@@ -148,9 +148,6 @@ func (ctx *BuiltinEvalContext) Provider(addr addrs.AbsProviderConfig) providers.
 
 func (ctx *BuiltinEvalContext) ProviderSchema(addr addrs.AbsProviderConfig) *ProviderSchema {
 	ctx.once.Do(ctx.init)
-
-	// FIXME: Once AbsProviderConfig starts containing an FQN, use that directly
-	// here instead of addr.ProviderConfig.LocalName.
 	return ctx.Schemas.ProviderSchema(addr.Provider)
 }
 
